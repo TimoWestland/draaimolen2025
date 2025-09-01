@@ -69,8 +69,14 @@ function slugify(str: string): string {
 
 // Convert raw JSON rows for a day into normalized Timeslot entries.
 // Empty stage entries extend the previous artist by 15 minutes.
-function normalizeDay(rows: any[], dayKey: string, dayName: string): DaySchedule {
-  const stages = Object.keys(rows[0] || {}).filter((k) => k !== dayKey && k !== "time");
+function normalizeDay(
+  rows: any[],
+  dayKey: string,
+  dayName: string
+): DaySchedule {
+  const stages = Object.keys(rows[0] || {}).filter(
+    (k) => k !== dayKey && k !== "time"
+  );
   const slots: Timeslot[] = [];
   const current: Record<string, { artist: string; start: number }> = {};
 
@@ -84,7 +90,9 @@ function normalizeDay(rows: any[], dayKey: string, dayName: string): DaySchedule
         // New artist begins, close previous if present
         const prev = current[stage];
         if (prev && prev.artist !== artist) {
-          slots.push(createSlot(dayName, stage, prev.artist, prev.start, minute));
+          slots.push(
+            createSlot(dayName, stage, prev.artist, prev.start, minute)
+          );
         }
         if (!prev || prev.artist !== artist) {
           current[stage] = { artist: artist.trim(), start: minute };
@@ -92,7 +100,10 @@ function normalizeDay(rows: any[], dayKey: string, dayName: string): DaySchedule
       } else if (artist && artist.toUpperCase() === "END") {
         // Stage ends
         const prev = current[stage];
-        if (prev) slots.push(createSlot(dayName, stage, prev.artist, prev.start, minute));
+        if (prev)
+          slots.push(
+            createSlot(dayName, stage, prev.artist, prev.start, minute)
+          );
         delete current[stage];
       }
       // empty string => continue previous artist
@@ -102,7 +113,9 @@ function normalizeDay(rows: any[], dayKey: string, dayName: string): DaySchedule
   // Close any running artists at day end
   for (const stage of Object.keys(current)) {
     const prev = current[stage];
-    slots.push(createSlot(dayName, stage, prev.artist, prev.start, DAY_END_MINUTE));
+    slots.push(
+      createSlot(dayName, stage, prev.artist, prev.start, DAY_END_MINUTE)
+    );
   }
 
   return { stages, slots };
@@ -135,7 +148,9 @@ export function normalizeTimetable(raw: any): Timetable {
   // Expected format: { friday: [...], saturday: [...] }
   // Fallback: raw array containing Friday data only
   const fridayRows = Array.isArray(raw) ? raw : raw.friday || [];
-  const saturdayRows = Array.isArray(raw) ? raw.saturday || [] : raw.saturday || [];
+  const saturdayRows = Array.isArray(raw)
+    ? raw.saturday || []
+    : raw.saturday || [];
 
   return {
     friday: normalizeDay(fridayRows, "FRIDAY", "friday"),
@@ -193,9 +208,11 @@ export function toggleFavorite(id: string): boolean {
 
 // --- Lookup -------------------------------------------------------------
 
-export function findSlotById(timetable: Timetable, id: string): Timeslot | undefined {
+export function findSlotById(
+  timetable: Timetable,
+  id: string
+): Timeslot | undefined {
   return timetable.friday.slots
     .concat(timetable.saturday.slots)
     .find((s) => s.id === id);
 }
-

@@ -1,4 +1,5 @@
 import "react-router";
+
 import { createRequestHandler } from "@react-router/express";
 import express from "express";
 
@@ -18,5 +19,5 @@ app.use(
         VALUE_FROM_EXPRESS: "Hello from Express",
       };
     },
-  }),
+  })
 );
