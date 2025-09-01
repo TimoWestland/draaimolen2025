@@ -1,0 +1,220 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": [
+      "**",
+      "!**/node_modules/**",
+      "!**/.vscode/**",
+      "!**/.env/**",
+      "!**/.changeset/**",
+      "!**/build/**",
+      "!**/dist/**",
+      "!**/public/build/**",
+      "!**/server-build/**",
+      "!**/storybook-static/**",
+      "!**/test-results/**",
+      "!**/playwright-report/**",
+      "!**/playwright/.cache/**",
+      "!**/coverage/**",
+      "!**/pnpm-lock.yaml",
+      "!**/.github/workflows/**",
+      "!**/package.json",
+      "!**/mockServiceWorker.js"
+    ]
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ":NODE:",
+              ":BLANK_LINE:",
+              "react",
+              ":BLANK_LINE:",
+              "react-router",
+              ":BLANK_LINE:",
+              [":PACKAGE:", "!@biogroup/**"],
+              ":BLANK_LINE:",
+              "@biogroup/**",
+              ":BLANK_LINE:",
+              ":ALIAS:",
+              ":BLANK_LINE:",
+              ":PATH:"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "globals": ["React", "JSX", "Faro", "ENV"],
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always"
+    }
+  },
+  "css": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false,
+      "a11y": {
+        "noAriaHiddenOnFocusable": "warn",
+        "noLabelWithoutControl": "warn",
+        "noRedundantRoles": "warn",
+        "useAltText": "warn",
+        "useAnchorContent": "warn",
+        "useFocusableInteractive": "warn",
+        "useHeadingContent": "warn",
+        "useSemanticElements": "warn",
+        "useValidAnchor": "warn",
+        "useValidAriaProps": "warn",
+        "noStaticElementInteractions": "error"
+      },
+      "complexity": {
+        "noExtraBooleanCast": "error",
+        "noUselessCatch": "error",
+        "noUselessFragments": "error",
+        "noUselessTernary": "error",
+        "useArrowFunction": "error",
+        "useOptionalChain": "error",
+        "useSimplifiedLogicExpression": "error",
+        "noAdjacentSpacesInRegex": "error",
+        "noArguments": "error"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noConstantCondition": "error",
+        "noEmptyCharacterClassInRegex": "error",
+        "noEmptyPattern": "error",
+        "noGlobalObjectCalls": "error",
+        "noInnerDeclarations": "error",
+        "noInvalidConstructorSuper": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
+        "noSetterReturn": "error",
+        "noSwitchDeclarations": "error",
+        "noUndeclaredVariables": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "noUnsafeFinally": "error",
+        "noUnsafeOptionalChaining": "error",
+        "noUnusedFunctionParameters": "error",
+        "noUnusedImports": "error",
+        "noUnusedLabels": "error",
+        "noUnusedVariables": "error",
+        "noVoidElementsWithChildren": "error",
+        "useExhaustiveDependencies": "error",
+        "useHookAtTopLevel": "error",
+        "useImportExtensions": {
+          "level": "error",
+          "fix": "unsafe"
+        },
+        "useIsNan": "error",
+        "useJsxKeyInIterable": "error",
+        "useValidForDirection": "error",
+        "noInvalidBuiltinInstantiation": "error",
+        "useValidTypeof": "error"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "error",
+          "fix": "safe",
+          "options": {
+            "attributes": ["className"],
+            "functions": ["cn"]
+          }
+        }
+      },
+      "performance": {
+        "noAccumulatingSpread": "error",
+        "noBarrelFile": "error",
+        "noDelete": "error",
+        "noReExportAll": "error",
+        "noDynamicNamespaceImportAccess": "error"
+      },
+      "style": {
+        "noInferrableTypes": "error",
+        "noNegationElse": "error",
+        "noNonNullAssertion": "warn",
+        "noParameterAssign": "error",
+        "noUselessElse": "error",
+        "useAsConstAssertion": "error",
+        "useConst": "error",
+        "useImportType": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"]
+          }
+        },
+        "useForOf": "error",
+        "useNodejsImportProtocol": "error",
+        "useSelfClosingElements": "error",
+        "useTemplate": "error",
+        "useThrowNewError": "error",
+        "useArrayLiterals": "error",
+        "noCommonJs": "error"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "error",
+        "noAsyncPromiseExecutor": "error",
+        "noCatchAssign": "error",
+        "noClassAssign": "error",
+        "noCommentText": "error",
+        "noCompareNegZero": "error",
+        "noControlCharactersInRegex": "error",
+        "noDebugger": "error",
+        "noDoubleEquals": "error",
+        "noDuplicateCase": "error",
+        "noDuplicateClassMembers": "error",
+        "noDuplicateObjectKeys": "error",
+        "noDuplicateParameters": "error",
+        "noDuplicateTestHooks": "error",
+        "noExtraNonNullAssertion": "error",
+        "noFallthroughSwitchClause": "error",
+        "noFocusedTests": "warn",
+        "noFunctionAssign": "error",
+        "noGlobalAssign": "error",
+        "noImportAssign": "error",
+        "noSelfCompare": "error",
+        "noExplicitAny": "error",
+        "noMisleadingCharacterClass": "error",
+        "noPrototypeBuiltins": "error",
+        "noRedeclare": "error",
+        "noShadowRestrictedNames": "error",
+        "noSparseArray": "error",
+        "noUnsafeNegation": "error",
+        "useDefaultSwitchClauseLast": "error",
+        "useErrorMessage": "error",
+        "useGetterReturn": "error",
+        "noWith": "error",
+        "noDocumentCookie": "error",
+        "noDuplicateElseIf": "error",
+        "noVar": "error",
+        "noConsole": {
+          "level": "warn",
+          "options": { "allow": ["error", "warn", "info"] }
+        }
+      }
+    }
+  }
+}
