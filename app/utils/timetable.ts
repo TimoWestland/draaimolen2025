@@ -3,6 +3,8 @@
 export const TIMETABLE_CACHE_KEY = 'festival:timetable'
 export const FAVORITES_KEY = 'festival:favorites'
 
+import json from '#app/data/timetable.json'
+
 export interface Timeslot {
   id: string
   day: string // "friday" | "saturday"
@@ -164,9 +166,6 @@ export function normalizeTimetable(raw: any): Timetable {
 // --- Fetch & cache ------------------------------------------------------
 
 export async function fetchTimetable(): Promise<Timetable> {
-  const res = await fetch('/api/timetable', { cache: 'no-cache' })
-  if (!res.ok) throw new Error('Failed to fetch timetable')
-  const json = await res.json()
   return normalizeTimetable(json)
 }
 

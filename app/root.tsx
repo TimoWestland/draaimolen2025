@@ -10,6 +10,7 @@ import {
 import type { Route } from './+types/root'
 import './app.css'
 
+// TODO: change font
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
@@ -17,6 +18,17 @@ export const links: Route.LinksFunction = () => [
     href: 'https://fonts.gstatic.com',
     crossOrigin: 'anonymous',
   },
+  {
+    rel: 'apple-touch-icon',
+    sizes: '180x180',
+    href: '/favicons/apple-touch-icon.png',
+  },
+  {
+    rel: 'manifest',
+    href: '/site.webmanifest',
+    crossOrigin: 'use-credentials',
+  },
+  { rel: 'icon', href: '/favicon.ico' },
   {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
@@ -32,7 +44,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="dark">
+      <body className="dark bg-background">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -56,6 +68,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       error.status === 404
         ? 'The requested page could not be found.'
         : error.statusText || details
+    // @ts-ignore
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message
     stack = error.stack

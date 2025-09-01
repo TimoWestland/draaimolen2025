@@ -18,7 +18,7 @@ import {
 import type { Route } from './+types/home'
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: 'Timetable | Draaimolen 2025' }]
+  return [{ title: 'Draaimolen' }]
 }
 
 // Timetable page for a single day with day tabs
@@ -62,8 +62,8 @@ export default function TimetablePage() {
   const stageIndex = Object.fromEntries(dayData.stages.map((s, i) => [s, i]))
 
   return (
-    <div className="h-screen w-screen overflow-auto">
-      <header className="sticky top-0 right-0 left-0 flex w-full items-center justify-between bg-[#888080] px-2">
+    <div className="h-svh w-svw overflow-auto bg-background">
+      <div className="sticky top-0 right-0 left-0 flex w-full items-center justify-between bg-[#888080] px-2">
         <div className="flex items-center gap-x-1">
           <img src="/logo.png" alt="Draaimolen 2025" className="h-12" />
           <h1 className="font-semibold text-foreground">Draaimolen</h1>
@@ -90,7 +90,7 @@ export default function TimetablePage() {
             Saturday
           </button>
         </div>
-      </header>
+      </div>
       <main
         className="inline-grid"
         style={{
