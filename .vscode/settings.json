@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
-    "draaimolen"
+    "draaimolen",
+    "Timeslot"
   ],
   "editor.defaultFormatter": "biomejs.biome",
   "[json]": {
