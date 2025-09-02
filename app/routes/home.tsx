@@ -4,6 +4,15 @@ import { useSearchParams } from 'react-router'
 
 import { Star } from 'lucide-react'
 
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '#app/components/ui/alert-dialog'
 import { cn } from '#app/utils/cn'
 import { formatText } from '#app/utils/format-text'
 import {
@@ -23,14 +32,61 @@ export const meta: Route.MetaFunction = () => {
   return [{ title: 'Draaimolen' }]
 }
 
+function WelcomeDialog() {
+  return (
+    <AlertDialog open={false}>
+      <AlertDialogContent>
+        <AlertDialogHeader className="text-pretty text-left">
+          <AlertDialogTitle>Welcome to Draaimolen 2025</AlertDialogTitle>
+          <AlertDialogDescription>
+            <p className="mb-4">
+              Welcome to my custom Draaimolen timetable app. I built this app
+              for fun based on the spreadsheet provided by Draaimolen to create
+              a nicer timetable experience (also, Excel is for work!)
+            </p>
+            <ul className="mb-4 ml-4 list-disc">
+              <li>
+                Save this website to your phone's home screen so you can open it
+                as a regular app!
+              </li>
+              <li>
+                None of your data is stored, everything is saved locally on your
+                phone
+              </li>
+              <li>
+                The app should work offline due to bad connectivity in the
+                forest
+              </li>
+              <li>Switch between fri/sat with the toggle in the top right</li>
+              <li>Save your favorite acts by tapping on the time slot</li>
+              <li>Tapping a saved slot will remove it from your favorites</li>
+            </ul>
+            <p className="mb-4">
+              <b>Disclaimer:</b> This app is not affiliated with the Draaimolen
+              festival. I built this for fun in a few spare hours. A working app
+              and correct data is therefore not guaranteed.
+            </p>
+            <p className="mb-1">Have a splendid rave in the forest!</p>
+            <i>x Timo</i>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Close</AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
 // Timetable page for a single day with day tabs
 export default function TimetablePage() {
   const [searchParams, setSearchParams] = useSearchParams()
+
   const [timetable, setTimetable] = useState<Timetable | null>(null)
+  const [favorites, setFavorites] = useState<string[]>(getFavoriteIds())
   const [activeDay, setActiveDay] = useState<Day>(
     (searchParams.get('day') as Day) ?? 'friday',
   )
-  const [favorites, setFavorites] = useState<string[]>(getFavoriteIds())
 
   // Load from cache first, then update from server
   useEffect(() => {
@@ -57,6 +113,7 @@ export default function TimetablePage() {
 
   return (
     <div className="h-svh w-svw overflow-auto bg-background">
+      <WelcomeDialog />
       <header className="sticky top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-primary-light px-2">
         <div className="flex items-center gap-x-1.5">
           <img src="/logo.png" alt="Draaimolen 2025" className="h-10" />
@@ -67,7 +124,7 @@ export default function TimetablePage() {
         <div className="flex items-center gap-x-1 rounded-lg bg-muted/80 p-1 text-muted-foreground">
           <button
             className={cn(
-              'rounded-md border border-transparent px-2 py-1 font-semibold text-sm transition-colors',
+              'rounded-md border border-transparent px-2 py-1 font-semibold text-xs transition-colors',
               activeDay === 'friday' &&
                 'border-input bg-input/60 text-foreground',
             )}
@@ -83,7 +140,7 @@ export default function TimetablePage() {
           </button>
           <button
             className={cn(
-              'rounded-md border border-transparent p-1 font-semibold text-sm transition-colors',
+              'rounded-md border border-transparent px-2 py-1 font-semibold text-xs transition-colors',
               activeDay === 'saturday' &&
                 'border-input bg-input/60 text-foreground',
             )}
@@ -102,13 +159,13 @@ export default function TimetablePage() {
       <main
         className="inline-grid"
         style={{
-          gridTemplateColumns: `3.75rem repeat(${dayData.stages.length}, minmax(8rem,1fr))`,
+          gridTemplateColumns: `3.5rem repeat(${dayData.stages.length}, minmax(8rem,1fr))`,
           gridTemplateRows: `2.75rem repeat(${times.length - 1}, 1.9rem)`,
         }}
       >
         {/* ── Corner cell ── */}
         <div
-          className="sticky top-12 left-0 z-60 flex w-full flex-col justify-center bg-secondary text-center font-display font-medium text-xs tracking-wider shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
+          className="sticky top-12 left-0 z-50 flex w-full flex-col justify-center bg-secondary text-center font-display font-medium text-xs tracking-wider shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
           style={{ gridColumn: 1, gridRow: 1 }}
         >
           {activeDay.slice(0, 3).toUpperCase()}
@@ -137,7 +194,7 @@ export default function TimetablePage() {
         {/* ── First-column spacer cell (sticky so the column looks continuous) ── */}
         <div
           aria-hidden="true"
-          className="sticky left-0 z-20 bg-accent shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
+          className="sticky left-0 z-10 bg-accent shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
           style={{ gridColumn: 1, gridRow: 2 }}
         />
 
@@ -149,7 +206,7 @@ export default function TimetablePage() {
             <div
               key={t}
               className={cn(
-                'sticky left-0 z-20 w-full bg-accent text-right text-foreground text-xs shadow-[2px_0_4px_rgba(0,0,0,0.1)]',
+                'sticky left-0 z-20 w-full bg-accent text-right text-foreground shadow-[2px_2px_4px_rgba(0,0,0,0.1)]',
                 fullHour && 'border-t',
                 halfHour &&
                   'before:-top-[2px] border-transparent border-t before:absolute before:right-0 before:h-px before:w-[9px] before:bg-border before:content-[""]',
@@ -157,7 +214,7 @@ export default function TimetablePage() {
               style={{ gridColumn: 1, gridRow: i + 3 }} // +1 due to spacer row
             >
               {fullHour ? (
-                <div className="-top-[17px] absolute left-0 bg-accent py-2 pr-[6px] pl-2 font-semibold">
+                <div className="-top-[16px] absolute left-0 bg-accent py-2 pr-[6px] pl-2 font-semibold text-[10px]">
                   {t}
                 </div>
               ) : null}
@@ -200,7 +257,7 @@ export default function TimetablePage() {
               <span className="text-pretty font-semibold">
                 {formatText(slot.artist)}
               </span>
-              <div className="mt-2 font-medium text-[10px] text-foreground/70">
+              <div className="mt-1.5 font-medium text-[9px] text-foreground/60">
                 ({slot.start} - {slot.end})
               </div>
             </button>
