@@ -3,11 +3,25 @@
 export const TIMETABLE_CACHE_KEY = 'festival:timetable'
 export const FAVORITES_KEY = 'festival:favorites'
 
-import json from '#app/data/timetable.json'
+import fridayJson from '#app/data/friday.json'
+import saturdayJson from '#app/data/saturday.json'
+
+export enum Stages {
+  STROBE = 'STROBE',
+  MOON = 'MOON',
+  AURA = 'AURA',
+  'FOREST RAVE' = 'FOREST RAVE',
+  PIT = 'PIT',
+  TUNNEL = 'TUNNEL',
+}
+
+interface TimeSlotRaw {
+  TIME: string
+  [stage: string]: string
+}
 
 export interface Timeslot {
   id: string
-  day: string // "friday" | "saturday"
   stage: string
   artist: string
   start: string // HH:mm
@@ -27,11 +41,8 @@ export interface Timetable {
   saturday: DaySchedule
 }
 
-// Times range from 12:00 to 00:45 in 15 minute steps
 export const DAY_START_MINUTE = parseTime('12:00')
 export const DAY_END_MINUTE = parseTime('24:45')
-
-// --- Time helpers -------------------------------------------------------
 
 // Parse "HH:mm" into minutes since 00:00, treating values <12 as next day
 export function parseTime(str: string): number {
@@ -50,7 +61,6 @@ export function formatTime(min: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
 }
 
-// Generate time labels for rows
 export function generateTimeLabels(): string[] {
   const times: string[] = []
   for (let m = DAY_START_MINUTE; m <= DAY_END_MINUTE; m += 15) {
@@ -59,7 +69,6 @@ export function generateTimeLabels(): string[] {
   return times
 }
 
-// Slugify for stable ids
 function slugify(str: string): string {
   return str
     .toLowerCase()
@@ -67,24 +76,13 @@ function slugify(str: string): string {
     .replace(/(^-|-$)/g, '')
 }
 
-// --- Normalization ------------------------------------------------------
-
-// Convert raw JSON rows for a day into normalized Timeslot entries.
-// Empty stage entries extend the previous artist by 15 minutes.
-function normalizeDay(
-  // biome-ignore lint/suspicious/noExplicitAny: todo
-  rows: any[],
-  dayKey: string,
-  dayName: string,
-): DaySchedule {
-  const stages = Object.keys(rows[0] || {}).filter(
-    (k) => k !== dayKey && k !== 'time',
-  )
+function normalizeRows(rows: TimeSlotRaw[]): DaySchedule {
+  const stages = Object.keys(Stages)
   const slots: Timeslot[] = []
   const current: Record<string, { artist: string; start: number }> = {}
 
   for (const row of rows) {
-    const timeStr: string = row[dayKey] || row.time // handle different formats
+    const timeStr: string = row.TIME
     if (!timeStr) continue
     const minute = parseTime(timeStr)
     for (const stage of stages) {
@@ -93,9 +91,7 @@ function normalizeDay(
         // New artist begins, close previous if present
         const prev = current[stage]
         if (prev && prev.artist !== artist) {
-          slots.push(
-            createSlot(dayName, stage, prev.artist, prev.start, minute),
-          )
+          slots.push(createSlot(stage, prev.artist, prev.start, minute))
         }
         if (!prev || prev.artist !== artist) {
           current[stage] = { artist: artist.trim(), start: minute }
@@ -104,29 +100,23 @@ function normalizeDay(
         // Stage ends
         const prev = current[stage]
         if (prev) {
-          slots.push(
-            createSlot(dayName, stage, prev.artist, prev.start, minute),
-          )
+          slots.push(createSlot(stage, prev.artist, prev.start, minute))
         }
         delete current[stage]
       }
-      // empty string => continue previous artist
     }
   }
 
   // Close any running artists at day end
   for (const stage of Object.keys(current)) {
     const prev = current[stage]
-    slots.push(
-      createSlot(dayName, stage, prev.artist, prev.start, DAY_END_MINUTE),
-    )
+    slots.push(createSlot(stage, prev.artist, prev.start, DAY_END_MINUTE))
   }
 
   return { stages, slots }
 }
 
 function createSlot(
-  day: string,
   stage: string,
   artist: string,
   start: number,
@@ -135,8 +125,7 @@ function createSlot(
   const startStr = formatTime(start)
   const endStr = formatTime(end)
   return {
-    id: slugify(`${day}-${stage}-${artist}-${startStr}`),
-    day,
+    id: slugify(`${stage}-${artist}-${startStr}`),
     stage,
     artist,
     start: startStr,
@@ -147,26 +136,18 @@ function createSlot(
   }
 }
 
-// TODO: add separate json files for friday and saturday and rewrite all this crap :)
+export function loadTimetable(): Timetable {
+  const cached = loadTimetableCache()
+  if (cached) return cached
 
-// Normalize full timetable structure
-// biome-ignore lint/suspicious/noExplicitAny: todo
-export function normalizeTimetable(raw: any): Timetable {
-  // Expected format: { friday: [...], saturday: [...] }
-  // Fallback: raw array containing Friday data only
-  const fridayRows = Array.isArray(raw) ? raw : raw.friday || []
-  const saturdayRows = Array.isArray(raw) ? raw : raw.saturday || []
-
-  return {
-    friday: normalizeDay(fridayRows, 'FRIDAY', 'friday'),
-    saturday: normalizeDay(saturdayRows, 'SATURDAY', 'saturday'),
+  const timetable = {
+    friday: normalizeRows(fridayJson),
+    saturday: normalizeRows(saturdayJson),
   }
-}
 
-// --- Fetch & cache ------------------------------------------------------
+  saveTimetableCache(timetable)
 
-export async function fetchTimetable(): Promise<Timetable> {
-  return normalizeTimetable(json)
+  return timetable
 }
 
 export function loadTimetableCache(): Timetable | null {
@@ -181,8 +162,6 @@ export function loadTimetableCache(): Timetable | null {
 export function saveTimetableCache(data: Timetable) {
   localStorage.setItem(TIMETABLE_CACHE_KEY, JSON.stringify(data))
 }
-
-// --- Favorites ----------------------------------------------------------
 
 export function getFavoriteIds(): string[] {
   try {
@@ -207,8 +186,6 @@ export function toggleFavorite(id: string): boolean {
   window.dispatchEvent(new Event('favoritesUpdated'))
   return idx === -1
 }
-
-// --- Lookup -------------------------------------------------------------
 
 export function findSlotById(
   timetable: Timetable,
