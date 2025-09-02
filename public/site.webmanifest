@@ -2,6 +2,7 @@
   "name": "Draaimolen 2025 timetable",
   "short_name": "Draaimolen",
   "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/favicons/android-chrome-192x192.png",
@@ -14,8 +15,8 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#8682ad",
-  "background_color": "#b684fd",
+  "background_color": "#09090b",
+  "theme_color": "#b684fd",
   "display": "standalone",
   "orientation": "portrait-primary"
 }
