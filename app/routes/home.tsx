@@ -68,8 +68,8 @@ export default function TimetablePage() {
       <header className="sticky top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-primary-light px-2">
         <div className="flex items-center gap-x-1.5">
           <img src="/logo.png" alt="Draaimolen 2025" className="h-10" />
-          <h1 className="font-display font-medium text-foreground text-shadow-lg text-sm uppercase leading-none tracking-wider">
-            Draaimolen
+          <h1 className="font-bold font-display text-foreground text-shadow-lg text-sm uppercase leading-none tracking-wide">
+            Draaimolen 2025
           </h1>
         </div>
         <div className="flex items-center gap-x-1 rounded-lg bg-muted/80 p-1 text-muted-foreground">
@@ -193,7 +193,7 @@ export default function TimetablePage() {
               onClick={() => toggleFavorite(slot.id)}
               className={cn(
                 'relative cursor-pointer overflow-hidden border-b border-l p-1 font-medium text-foreground text-sm transition-colors',
-                fav ? 'bg-primary/95' : 'bg-card text-card-foreground',
+                fav ? 'bg-primary/60' : 'bg-card text-card-foreground',
                 isFirstSlotInStage && 'border-t',
               )}
               style={{ gridColumn: col, gridRow: `${rowStart} / span ${span}` }}
@@ -214,6 +214,19 @@ export default function TimetablePage() {
             </button>
           )
         })}
+
+        {/* ── Spacer row (bottom) ── */}
+        <div
+          className="h-[1.9rem] border-muted border-l bg-background"
+          style={{ gridColumn: '2 / -1', gridRow: times.length + 2 }}
+        />
+
+        {/* ── First-column spacer cell (bottom) ── */}
+        <div
+          aria-hidden="true"
+          className="sticky left-0 z-10 bg-accent shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
+          style={{ gridColumn: 1, gridRow: times.length + 2 }}
+        />
       </main>
     </div>
   )

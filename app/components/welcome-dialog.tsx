@@ -97,68 +97,44 @@ export function WelcomeDialog({
     deferredPromptRef.current = null
   }
 
+  if (inStandalone) {
+    return null
+  }
+
   return (
     <>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader className="text-pretty text-left">
-            <AlertDialogTitle>
-              {showIosContent
-                ? 'Add this app to your Home Screen in Safari'
-                : 'Welcome to Draaimolen 2025'}
-            </AlertDialogTitle>
-            {showIosContent ? null : (
-              <p className="mb-4 text-sm">
-                Welcome to my custom Draaimolen timetable app. I built this app
-                for fun based on the spreadsheet provided by Draaimolen to
-                create a nicer timetable experience (and also because I don't
-                want to use Excel while raving 😛).
-              </p>
-            )}
-            {showIosContent ? (
-              <ul className="mb-4 ml-4 list-disc space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  Tap the <Share size={20} /> icon
-                </li>
-                <li className="flex items-center gap-2">
-                  Select <PlusSquare size={20} /> Add to home screen
-                </li>
-              </ul>
-            ) : (
-              <ul className="mb-4 ml-4 list-disc space-y-2 text-sm">
-                <li>
-                  Save this website to your phone's home screen so you can open
-                  it as a regular app (click install button below)
-                </li>
-                <li>
-                  No data is collected, everything is saved locally on your
-                  phone
-                </li>
-                <li>
-                  The app should work offline due to bad connectivity in the
-                  forest
-                </li>
-                <li>Switch between days with the toggle in the top right</li>
-                <li>
-                  Save your favorite acts by tapping on the time slot. Tapping a
-                  saved slot will remove it from your favorites
-                </li>
-              </ul>
-            )}
-            {showIosContent ? null : (
-              <>
-                <p className="mb-4 text-sm">
-                  <b>Disclaimer:</b> This app is not affiliated with the
-                  Draaimolen festival. I built this app in a few spare hours. A
-                  working app and correct data is therefore not guaranteed.
-                </p>
-                <p className="text-sm">
-                  Have a splendid rave in the forest!
-                  <br />
-                  <i>x Timo</i>
-                </p>
-              </>
-            )}
+            <AlertDialogTitle>Draaimolen Timetable App</AlertDialogTitle>
+            <p className="mb-4 text-sm">
+              I built this app based on the spreadsheet provided by Draaimolen
+              to create a nicer timetable experience (and because I don't want
+              to use Excel during a festival 😛)
+            </p>
+
+            <ul className="mb-2 ml-4 list-disc space-y-2 text-sm">
+              <li>
+                Save this website to your phone's home screen so you can open
+                like an any other app
+              </li>
+              <li>Everything is saved locally on your phone</li>
+              <li>
+                The app should work offline due to bad connectivity in the
+                forest
+              </li>
+              <li>Save your favorite acts by tapping on the time slot.</li>
+            </ul>
+            <p className="mb-2 text-sm">
+              <b>Disclaimer:</b> This app is not affiliated with or provided by
+              the Draaimolen festival. I built this app in a few spare hours. A
+              working app and correct data is therefore not guaranteed.
+            </p>
+            <p className="text-sm">
+              Have a splendid rave in the forest!
+              <br />
+              <i>x Timo</i>
+            </p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
