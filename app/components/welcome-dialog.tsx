@@ -190,7 +190,7 @@ function IosDialog({
       <AlertDialogContent>
         <AlertDialogHeader className="text-pretty text-left">
           <AlertDialogTitle className="mb-2">
-            Install this app in Safari
+            Install this app on iOS
           </AlertDialogTitle>
           <ul className="mb-4 list-disc space-y-2 text-sm">
             <li className="flex items-center gap-2">
