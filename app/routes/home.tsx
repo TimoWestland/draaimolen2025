@@ -68,8 +68,8 @@ export default function TimetablePage() {
       <header className="sticky top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-primary-light px-2">
         <div className="flex items-center gap-x-1.5">
           <img src="/logo.png" alt="Draaimolen 2025" className="h-10" />
-          <h1 className="font-bold font-display text-foreground text-shadow-lg text-sm uppercase leading-none tracking-wide">
-            Draaimolen 2025
+          <h1 className="font-display font-medium text-foreground text-shadow-lg text-sm uppercase leading-none tracking-wider">
+            Draaimolen '25
           </h1>
         </div>
         <div className="flex items-center gap-x-1 rounded-lg bg-muted/80 p-1 text-muted-foreground">
