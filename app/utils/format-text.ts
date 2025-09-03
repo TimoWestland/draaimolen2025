@@ -17,6 +17,9 @@ const upperExceptions = [
   'I-SHA',
   'SCRATCHCLART',
   'L.B.',
+  'II',
+  'INVT',
+  'HVL',
 ]
 
 const lowerExceptions = [
@@ -27,6 +30,9 @@ const lowerExceptions = [
   'U.R.TRAX',
   'GYROFIELD',
   'OPHÉLIE',
+  'OMA',
+  'TOTEM',
+  'DIRTYDMS',
 ]
 
 export function formatText(str: string) {

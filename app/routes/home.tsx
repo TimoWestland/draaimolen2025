@@ -4,16 +4,7 @@ import { useSearchParams } from 'react-router'
 
 import { Star } from 'lucide-react'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '#app/components/ui/alert-dialog'
+import { WelcomeDialog } from '#app/components/welcome-dialog'
 import { cn } from '#app/utils/cn'
 import { formatText } from '#app/utils/format-text'
 import {
@@ -33,70 +24,27 @@ export const meta: Route.MetaFunction = () => {
   return [{ title: 'Draaimolen' }]
 }
 
-function WelcomeDialog() {
-  return (
-    <AlertDialog open={false}>
-      <AlertDialogContent>
-        <AlertDialogHeader className="text-pretty text-left">
-          <AlertDialogTitle>Welcome to Draaimolen 2025</AlertDialogTitle>
-          <AlertDialogDescription>
-            <p className="mb-4">
-              Welcome to my custom Draaimolen timetable app. I built this app
-              for fun based on the spreadsheet provided by Draaimolen to create
-              a nicer timetable experience (also, Excel is for work!)
-            </p>
-            <ul className="mb-4 ml-4 list-disc">
-              <li>
-                Save this website to your phone's home screen so you can open it
-                as a regular app!
-              </li>
-              <li>
-                None of your data is stored, everything is saved locally on your
-                phone
-              </li>
-              <li>
-                The app should work offline due to bad connectivity in the
-                forest
-              </li>
-              <li>Switch between fri/sat with the toggle in the top right</li>
-              <li>Save your favorite acts by tapping on the time slot</li>
-              <li>Tapping a saved slot will remove it from your favorites</li>
-            </ul>
-            <p className="mb-4">
-              <b>Disclaimer:</b> This app is not affiliated with the Draaimolen
-              festival. I built this for fun in a few spare hours. A working app
-              and correct data is therefore not guaranteed.
-            </p>
-            <p className="mb-1">Have a splendid rave in the forest!</p>
-            <i>x Timo</i>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Close</AlertDialogCancel>
-          <AlertDialogAction>Add to home screen</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
-
-// Timetable page for a single day with day tabs
 export default function TimetablePage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const [showDialog, setShowDialog] = useState(false)
   const [timetable, setTimetable] = useState<Timetable | null>(null)
   const [favorites, setFavorites] = useState<string[]>(getFavoriteIds())
   const [activeDay, setActiveDay] = useState<Day>(
     (searchParams.get('day') as Day) ?? 'friday',
   )
 
-  // Load from cache first, then update from server
   useEffect(() => {
     const timetable = loadTimetable()
     setTimetable(timetable)
+
+    const firstVisit = !localStorage.getItem('visited-before')
+    if (firstVisit) {
+      setShowDialog(true)
+      localStorage.setItem('visited-before', 'true')
+    }
   }, [])
 
-  // Listen for favorite changes
   useEffect(() => {
     const handler = () => setFavorites(getFavoriteIds())
     window.addEventListener('favoritesUpdated', handler)
@@ -115,11 +63,12 @@ export default function TimetablePage() {
 
   return (
     <div className="h-svh w-svw overflow-auto bg-background">
-      <WelcomeDialog />
+      <WelcomeDialog open={showDialog} onOpenChange={setShowDialog} />
+
       <header className="sticky top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-primary-light px-2">
         <div className="flex items-center gap-x-1.5">
           <img src="/logo.png" alt="Draaimolen 2025" className="h-10" />
-          <h1 className="font-display font-medium text-primary-foreground text-shadow-lg text-sm uppercase leading-none tracking-wider">
+          <h1 className="font-display font-medium text-foreground text-shadow-lg text-sm uppercase leading-none tracking-wider">
             Draaimolen
           </h1>
         </div>
@@ -187,13 +136,13 @@ export default function TimetablePage() {
           </div>
         ))}
 
-        {/* ── Spacer row: columns 2..end ── */}
+        {/* ── Spacer row ── */}
         <div
           className="border-muted border-l bg-background"
           style={{ gridColumn: '2 / -1', gridRow: 2 }}
         />
 
-        {/* ── First-column spacer cell (sticky so the column looks continuous) ── */}
+        {/* ── First-column spacer cell ── */}
         <div
           aria-hidden="true"
           className="sticky left-0 z-10 bg-accent shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
@@ -224,7 +173,7 @@ export default function TimetablePage() {
           )
         })}
 
-        {/* ── Timeslot cells (rowStart +1 due to spacer) ── */}
+        {/* ── Timeslot cells ── */}
         {dayData.slots.map((slot) => {
           const col = stageIndex[slot.stage] + 2
           const rowStart = (slot.startMinutes - DAY_START_MINUTE) / 15 + 3
@@ -259,7 +208,7 @@ export default function TimetablePage() {
               <span className="text-pretty font-semibold">
                 {formatText(slot.artist)}
               </span>
-              <div className="mt-1.5 font-medium text-[9px] text-foreground/60">
+              <div className="mt-1 font-medium text-[9px] text-foreground/60">
                 ({slot.start} - {slot.end})
               </div>
             </button>
