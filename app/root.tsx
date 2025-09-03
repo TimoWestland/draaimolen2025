@@ -43,6 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <script src="/sw-registration.js" />
       </body>
     </html>
   )
