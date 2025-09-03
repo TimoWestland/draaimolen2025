@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useSearchParams } from 'react-router'
 
@@ -34,6 +34,18 @@ export default function TimetablePage() {
     (searchParams.get('day') as Day) ?? 'friday',
   )
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to reset the scroll position when the active day changes
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    // Reset both axes
+    el.scrollLeft = 0
+    el.scrollTop = 0
+    // Or: el.scrollTo({ left: 0, top: 0, behavior: 'auto' })
+  }, [activeDay])
+
   useEffect(() => {
     const timetable = loadTimetable()
     setTimetable(timetable)
@@ -62,7 +74,10 @@ export default function TimetablePage() {
   const stageIndex = Object.fromEntries(dayData.stages.map((s, i) => [s, i]))
 
   return (
-    <div className="h-svh w-svw overflow-auto overscroll-none bg-background">
+    <div
+      ref={scrollRef}
+      className="h-svh w-svw overflow-auto overscroll-none bg-background"
+    >
       <WelcomeDialog open={showDialog} onOpenChange={setShowDialog} />
 
       <header className="sticky top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-primary-light px-2">
