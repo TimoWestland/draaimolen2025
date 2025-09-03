@@ -62,7 +62,7 @@ export default function TimetablePage() {
   const stageIndex = Object.fromEntries(dayData.stages.map((s, i) => [s, i]))
 
   return (
-    <div className="h-svh w-svw overflow-auto bg-background">
+    <div className="h-svh w-svw overflow-auto overscroll-none bg-background">
       <WelcomeDialog open={showDialog} onOpenChange={setShowDialog} />
 
       <header className="sticky top-0 right-0 left-0 z-50 flex h-12 w-full items-center justify-between bg-primary-light px-2">
@@ -193,7 +193,7 @@ export default function TimetablePage() {
               onClick={() => toggleFavorite(slot.id)}
               className={cn(
                 'relative cursor-pointer overflow-hidden border-b border-l p-1 font-medium text-foreground text-sm transition-colors',
-                fav ? 'bg-primary/90' : 'bg-card text-card-foreground',
+                fav ? 'bg-primary/95' : 'bg-card text-card-foreground',
                 isFirstSlotInStage && 'border-t',
               )}
               style={{ gridColumn: col, gridRow: `${rowStart} / span ${span}` }}
@@ -208,7 +208,7 @@ export default function TimetablePage() {
               <span className="text-pretty font-semibold">
                 {formatText(slot.artist)}
               </span>
-              <div className="mt-1 font-medium text-[9px] text-foreground/60">
+              <div className="mt-1 font-medium text-[9px] text-foreground/70">
                 ({slot.start} - {slot.end})
               </div>
             </button>
