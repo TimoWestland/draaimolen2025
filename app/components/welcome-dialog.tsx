@@ -120,8 +120,7 @@ export function WelcomeDialog({
               </li>
               <li>Everything is saved locally on your phone</li>
               <li>
-                The app should work offline due to bad connectivity in the
-                forest
+                The app should work offline, just don't fully close the app.
               </li>
               <li>Save your favorite acts by tapping on the time slot.</li>
             </ul>

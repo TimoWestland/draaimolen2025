@@ -40,10 +40,8 @@ export default function TimetablePage() {
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    // Reset both axes
     el.scrollLeft = 0
     el.scrollTop = 0
-    // Or: el.scrollTo({ left: 0, top: 0, behavior: 'auto' })
   }, [activeDay])
 
   useEffect(() => {
@@ -153,6 +151,7 @@ export default function TimetablePage() {
 
         {/* ── Spacer row ── */}
         <div
+          aria-hidden="true"
           className="border-muted border-l bg-background"
           style={{ gridColumn: '2 / -1', gridRow: 2 }}
         />
@@ -207,7 +206,7 @@ export default function TimetablePage() {
               key={slot.id}
               onClick={() => toggleFavorite(slot.id)}
               className={cn(
-                'relative cursor-pointer overflow-hidden border-b border-l p-1 font-medium text-foreground text-sm transition-colors',
+                'relative cursor-pointer overflow-hidden border-b border-l p-2 font-medium text-foreground text-sm transition-colors',
                 fav ? 'bg-primary/60' : 'bg-card text-card-foreground',
                 isFirstSlotInStage && 'border-t',
               )}
@@ -232,6 +231,7 @@ export default function TimetablePage() {
 
         {/* ── Spacer row (bottom) ── */}
         <div
+          aria-hidden="true"
           className="h-[1.9rem] border-muted border-l bg-background"
           style={{ gridColumn: '2 / -1', gridRow: times.length + 2 }}
         />

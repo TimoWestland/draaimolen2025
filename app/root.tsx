@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 import {
   isRouteErrorResponse,
   Links,
@@ -5,12 +7,15 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  useLocation,
 } from 'react-router'
 
 import type { Route } from './+types/root'
 import './app.css'
 
-// TODO: change font
+import { getDomainUrl, removeTrailingSlash } from './utils/misc.ts'
+
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.cdnfonts.com' },
   {
@@ -30,7 +35,54 @@ export const links: Route.LinksFunction = () => [
   },
 ]
 
+export async function loader({ request }: Route.LoaderArgs) {
+  return {
+    requestInfo: {
+      origin: getDomainUrl(request),
+      path: new URL(request.url).pathname,
+    },
+  }
+}
+
+declare global {
+  interface Window {
+    fathom:
+      | {
+          trackPageview(): void
+          trackGoal(id: string, cents: number): void
+        }
+      | undefined
+  }
+}
+
+type FathomQueue = Array<{ command: 'trackPageview' }>
+
+function CanonicalUrl({
+  origin,
+  fathomQueue,
+}: {
+  origin: string
+  fathomQueue: React.RefObject<FathomQueue>
+}) {
+  const { pathname } = useLocation()
+  const canonicalUrl = removeTrailingSlash(`${origin}${pathname}`)
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Fathom looks uses the canonical URL to track visits, so we're using it as a dependency even though we're not using it explicitly
+  useEffect(() => {
+    if (window.fathom) {
+      window.fathom.trackPageview()
+    } else {
+      fathomQueue.current.push({ command: 'trackPageview' })
+    }
+  }, [canonicalUrl])
+
+  return <link rel="canonical" href={canonicalUrl} />
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>()
+  const fathomQueue = useRef<FathomQueue>([])
+
   return (
     <html lang="en">
       <head>
@@ -38,12 +90,32 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <CanonicalUrl
+          origin={data.requestInfo.origin}
+          fathomQueue={fathomQueue}
+        />
       </head>
       <body className="dark">
         {children}
         <ScrollRestoration />
         <Scripts />
         <script src="/sw-registration.js" />
+        <script
+          src="https://cdn.usefathom.com/script.js"
+          data-site="PWBHRUJI"
+          data-spa="history"
+          data-auto="false" // prevent tracking visit twice on initial page load
+          data-excluded-domains="localhost"
+          defer
+          onLoad={() => {
+            fathomQueue.current.forEach(({ command }) => {
+              if (window.fathom) {
+                window.fathom[command]()
+              }
+            })
+            fathomQueue.current = []
+          }}
+        />
       </body>
     </html>
   )
