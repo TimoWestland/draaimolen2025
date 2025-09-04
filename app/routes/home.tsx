@@ -24,9 +24,14 @@ export const meta: Route.MetaFunction = () => {
   return [{ title: 'Draaimolen' }]
 }
 
+const HEADER_REM = 2.75 // row 1 height
+const SPACER_REM = 1.9 // row 2 height (your spacer row)
+const ROW_REM = 1.9 // each 15-min row height
+
 export default function TimetablePage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const [nowY, setNowY] = useState<number | null>(null)
   const [showDialog, setShowDialog] = useState(false)
   const [timetable, setTimetable] = useState<Timetable | null>(null)
   const [favorites, setFavorites] = useState<string[]>(getFavoriteIds())
@@ -35,6 +40,36 @@ export default function TimetablePage() {
   )
 
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const compute = () => {
+      const remPx = parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      )
+      const now = new Date()
+      const minutes = now.getHours() * 60 + now.getMinutes()
+
+      const start = 12 * 60 // 12:00
+      const end = 24 * 60 + 30 // 24:30
+
+      if (minutes < start || minutes > end) {
+        setNowY(null)
+        return
+      }
+
+      const offsetRows = (minutes - start) / 15 // 15 min per row
+      const yPx = (HEADER_REM + SPACER_REM + offsetRows * ROW_REM) * remPx
+      setNowY(yPx)
+    }
+
+    compute()
+    const t = setInterval(compute, 30_000) // update twice a minute
+    window.addEventListener('resize', compute)
+    return () => {
+      clearInterval(t)
+      window.removeEventListener('resize', compute)
+    }
+  }, [])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: we want to reset the scroll position when the active day changes
   useEffect(() => {
@@ -121,12 +156,28 @@ export default function TimetablePage() {
         </div>
       </header>
       <main
-        className="inline-grid"
+        className="relative inline-grid"
         style={{
           gridTemplateColumns: `3.5rem repeat(${dayData.stages.length}, minmax(8rem,1fr))`,
           gridTemplateRows: `2.75rem repeat(${times.length - 1}, 1.9rem)`,
         }}
       >
+        {nowY !== null && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-70"
+            style={{
+              gridColumn: '1 / -1',
+              gridRow: '1 / -1',
+            }}
+          >
+            {/* Position at computed Y */}
+            <div className="absolute right-0 left-0" style={{ top: nowY }}>
+              <div className="sticky right-0 left-0 h-[2px] w-[100svw] border-primary-light/90 border-b-2 border-dashed shadow-[0_0_0_1px_rgba(0,0,0,0.06)]" />
+            </div>
+          </div>
+        )}
+
         {/* ── Corner cell ── */}
         <div
           className="sticky top-12 left-0 z-50 flex w-full flex-col justify-center bg-secondary text-center font-display font-medium text-xs tracking-wider shadow-[2px_0_4px_rgba(0,0,0,0.1)]"
