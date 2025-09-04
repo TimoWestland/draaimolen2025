@@ -32,6 +32,8 @@ export default function TimetablePage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [nowY, setNowY] = useState<number | null>(null)
+  const [nowMinutes, setNowMinutes] = useState<number | null>(null)
+
   const [showDialog, setShowDialog] = useState(false)
   const [timetable, setTimetable] = useState<Timetable | null>(null)
   const [favorites, setFavorites] = useState<string[]>(getFavoriteIds())
@@ -48,22 +50,21 @@ export default function TimetablePage() {
       )
       const now = new Date()
       const minutes = now.getHours() * 60 + now.getMinutes()
+      setNowMinutes(minutes) // <-- track "now" for completion checks
 
       const start = 12 * 60 // 12:00
       const end = 24 * 60 + 30 // 24:30
-
       if (minutes < start || minutes > end) {
         setNowY(null)
-        return
+      } else {
+        const offsetRows = (minutes - start) / 15
+        const yPx = (HEADER_REM + SPACER_REM + offsetRows * ROW_REM) * remPx
+        setNowY(yPx)
       }
-
-      const offsetRows = (minutes - start) / 15 // 15 min per row
-      const yPx = (HEADER_REM + SPACER_REM + offsetRows * ROW_REM) * remPx
-      setNowY(yPx)
     }
 
     compute()
-    const t = setInterval(compute, 30_000) // update twice a minute
+    const t = setInterval(compute, 30_000)
     window.addEventListener('resize', compute)
     return () => {
       clearInterval(t)
@@ -105,6 +106,16 @@ export default function TimetablePage() {
   const dayData = timetable[activeDay]
   const times = generateTimeLabels()
   const stageIndex = Object.fromEntries(dayData.stages.map((s, i) => [s, i]))
+  // Map your two day tabs to weekday indices (0=Sun..6=Sat)
+  const dayIndexMap: Record<'friday' | 'saturday', number> = {
+    friday: 5,
+    saturday: 6,
+  }
+
+  const todayIdx = new Date().getDay()
+  const activeIdx = dayIndexMap[activeDay]
+  const isPastDay = activeIdx < todayIdx
+  const isToday = activeIdx === todayIdx
 
   return (
     <div
@@ -251,6 +262,10 @@ export default function TimetablePage() {
                 .filter((s) => s.stage === slot.stage)
                 .map((s) => s.startMinutes),
             )
+          const endMinutes = slot.startMinutes + slot.durationMinutes
+          const completed =
+            isPastDay ||
+            (isToday && nowMinutes !== null && nowMinutes >= endMinutes)
 
           return (
             <button
@@ -258,7 +273,9 @@ export default function TimetablePage() {
               onClick={() => toggleFavorite(slot.id)}
               className={cn(
                 'relative cursor-pointer overflow-hidden border-b border-l p-2 font-medium text-foreground text-sm transition-colors',
-                fav ? 'bg-primary/60' : 'bg-card text-card-foreground',
+                fav ? 'bg-primary/70' : 'bg-card text-card-foreground',
+                completed && !fav && 'bg-muted text-foreground/70',
+                completed && fav && 'bg-primary/40 text-foreground/80',
                 isFirstSlotInStage && 'border-t',
               )}
               style={{ gridColumn: col, gridRow: `${rowStart} / span ${span}` }}
