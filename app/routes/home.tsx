@@ -173,7 +173,7 @@ export default function TimetablePage() {
           >
             {/* Position at computed Y */}
             <div className="absolute right-0 left-0" style={{ top: nowY }}>
-              <div className="sticky right-0 left-0 h-[2px] w-[100svw] border-primary-light/90 border-b-2 border-dashed shadow-[0_0_0_1px_rgba(0,0,0,0.06)]" />
+              <div className="sticky right-0 left-0 h-[2px] w-svw border-primary-light/90 border-b-2 border-dashed" />
             </div>
           </div>
         )}
