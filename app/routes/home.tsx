@@ -24,9 +24,9 @@ export const meta: Route.MetaFunction = () => {
   return [{ title: 'Draaimolen' }]
 }
 
-const HEADER_REM = 2.75 // row 1 height
-const SPACER_REM = 1.9 // row 2 height (your spacer row)
-const ROW_REM = 1.9 // each 15-min row height
+const HEADER_REM = 2.75
+const SPACER_REM = 1.9
+const ROW_REM = 1.9
 
 export default function TimetablePage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -162,6 +162,7 @@ export default function TimetablePage() {
           gridTemplateRows: `2.75rem repeat(${times.length - 1}, 1.9rem)`,
         }}
       >
+        {/* ── Now indicator line ── */}
         {nowY !== null && (
           <div
             aria-hidden="true"
@@ -171,7 +172,6 @@ export default function TimetablePage() {
               gridRow: '1 / -1',
             }}
           >
-            {/* Position at computed Y */}
             <div className="absolute right-0 left-0" style={{ top: nowY }}>
               <div className="sticky right-0 left-0 h-[2px] w-svw border-primary-light/90 border-b-2 border-dashed" />
             </div>
